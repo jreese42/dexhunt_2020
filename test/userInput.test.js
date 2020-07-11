@@ -5,9 +5,23 @@ const UserInput = require('../game/UserInput.js')
 
 describe('Tokenizer Tests', () => {
     it('should handle basic input', () => {
-           var userInput = new UserInput("This is a test.")
-           expect(userInput.getTokens()).to.eql(["This", "is", "a", "test."])
+           var userInput = new UserInput("this is a test")
+           expect(userInput.getTokens()).to.eql(["this", "is", "a", "test"])
        });
+    it('should remove all punctuation', () => {
+        var userInput = new UserInput("This. is?? a (test) &^%")
+        expect(userInput.getTokens()).to.eql(["this", "is", "a", "test"])
+    });
+    
+    it('should return lowercase', () => {
+        var userInput = new UserInput("THIS Is A tesT")
+        expect(userInput.getTokens()).to.eql(["this", "is", "a", "test"])
+    });
+
+    it('should use substitutions', () => {
+        var userInput = new UserInput("N E S W NN EE SS WW")
+        expect(userInput.getTokens()).to.eql(["north", "east", "south", "west", "nn", "ee", "ss", "ww"])
+    });
 });
 
 describe('Lexer Tests', () => {
