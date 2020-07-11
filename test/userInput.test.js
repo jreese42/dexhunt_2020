@@ -22,6 +22,11 @@ describe('Tokenizer Tests', () => {
         var userInput = new UserInput("N E S W NN EE SS WW")
         expect(userInput.getTokens()).to.eql(["north", "east", "south", "west", "nn", "ee", "ss", "ww"])
     });
+
+    it('should reduce conjuctive pair', () => {
+        var userInput = new UserInput("this and then that")
+        expect(userInput.getTokens()).to.eql(["this", "and", "that"])
+    });
 });
 
 describe('Lexer Tests', () => {
@@ -32,9 +37,9 @@ describe('Lexer Tests', () => {
        });
 });
 
-describe('User Input Processing Tests', () => {
+describe('Action Processor Tests', () => {
     it('should find verb', () => {
-           var userInput = new UserInput("Give Hug to Orc")
+           var userInput = new UserInput("Give Hug to Orc then slap him")
            assert.equal(true, true);
        });
        it('should find verb', () => {
