@@ -4,6 +4,12 @@
  */
 
 const WebSocket = require('ws');
+const Player = require('./Player');
+const UserInput = require('./UserInput');
+const World = require('./World.js');
+
+var world = new World();
+
 const wssOptions = {
     port: 33053,
     perMessageDeflate: {
@@ -64,9 +70,23 @@ class WebSocketServer {
     }
 
     _processInitializationCommand(ws, data) {
+
+      var player = new Player();
+      player.currentRoom = world.getRoom(0); //room1
+      var userInput = new UserInput(data["playerInput"]);
+      
       var response = {};
       response["playerInput"] = data["playerInput"];
-      response["resultOutput"] = "You said: \"" + data["playerInput"] + "\""
+
+      if (data.playerId) {
+        //Initial command - send context to player
+        response["resultOutput"] = player.getCurrentRoom().getShortDescription();
+        return response;
+      }
+
+      //will need initialization of sockets later
+      //for now just go straight through to command parsing
+      response["resultOutput"] = player.process_playerAction(userInput.getAction(0));
       return response;
     }
 }

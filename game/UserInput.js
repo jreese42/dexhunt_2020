@@ -104,6 +104,9 @@ class Tokenizer {
     }
 
     tokenize(rawString) {
+        if (!rawString) {
+            return [];
+        }
         rawString = rawString.replace(/[.,\/#!$?%\^&\*;:{}=\-_`~()]/g,""); //Remove punctuation
         var tokens = rawString.split(' ')
         if (!tokens) {
@@ -139,7 +142,7 @@ class Lexer {
         /* See tags here: https://www.npmjs.com/package/parts-of-speech */
         var lexiconExtension = {
             'Obama': [PartOfSpeech.NOUN_PROPER_SINGLE],
-            'Hug': [PartOfSpeech.VERB],
+            'Use': [PartOfSpeech.VERB],
         }
         this.tagger.extendLexicon(lexiconExtension);
     }
