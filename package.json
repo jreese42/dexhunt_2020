@@ -4,19 +4,20 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "mocha"
+    "test": "npx mocha"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
-    "jade": "~1.11.0",
     "jquery": "^3.5.1",
     "morgan": "~1.9.1",
     "parts-of-speech": "^0.3.0",
     "pos": "^0.4.2",
+    "pug": "^3.0.0",
     "sequelize": "^6.3.3",
+    "vorple": "^3.1.0",
     "ws": "^7.3.1",
     "xterm": "^4.8.1",
     "xterm-addon-fit": "^0.4.0"

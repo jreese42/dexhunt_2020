@@ -73,6 +73,7 @@ class Tokenizer {
             "e": "east",
             "s": "south",
             "w": "west",
+            "open": "use",
         }
         this._conjunctivePairs = {
             "and then": "and", //simplify conjuctive phrasing
@@ -137,8 +138,8 @@ class Lexer {
     _initLexicon() {
         /* See tags here: https://www.npmjs.com/package/parts-of-speech */
         var lexiconExtension = {
-            'Obama': ['NNP'],
-            'Hug': ['VB'],
+            'Obama': [PartOfSpeech.NOUN_PROPER_SINGLE],
+            'Hug': [PartOfSpeech.VERB],
         }
         this.tagger.extendLexicon(lexiconExtension);
     }
@@ -163,18 +164,18 @@ class PlayerAction {
 
 class ActionProcessor {
     constructor() {
-        this._coordAdverbs = ["then"]; //TODO: Fix this. "then" in this._coordAdverbs === false 
+        this._coordAdverbs = ["then"]; 
     }
 
     processActions(partsOfSpeech) {
+        var contextNoun = "";
         //split on Coordinating conjunctions or Conjunctive adverbs (then)
         //replace PRP with reference to direct object
         var actionList = [new PlayerAction()]
         partsOfSpeech.forEach(posEntry => {
             var word = posEntry[0];
             var pos = posEntry[1];
-            console.log("then" in this._coordAdverbs);
-            if (pos == PartOfSpeech.COORD_CUNJUNCTION || (word in this._coordAdverbs)) {
+            if (pos == PartOfSpeech.COORD_CUNJUNCTION || (this._coordAdverbs.includes(word))) {
                 actionList.push(new PlayerAction())
             }
             else {
@@ -188,6 +189,7 @@ class ActionProcessor {
                     }
                 }
                 if (pos == PartOfSpeech.NOUN || pos == PartOfSpeech.NOUN_PLURAL || pos == PartOfSpeech.NOUN_PROPER_SINGLE || pos == PartOfSpeech.NOUN_PROPER_PLURAL) {
+                    contextNoun = word;
                     if (actionList[actionList.length-1].directObject && actionList[actionList.length-1].indirectObject) {
                         console.log("Dropping noun ", word, " because two nouns were already found.")
                     }
@@ -201,7 +203,12 @@ class ActionProcessor {
                 if (pos == PartOfSpeech.PRONOUN_PERSONAL) {
                     //Assume the personal pronoun reference to the direct object of the previous clause
                     if (actionList.length > 1) {
-                        actionList[actionList.length-1].directObject = actionList[actionList.length-2].directObject;
+                        if (!contextNoun) {
+                            actionList[actionList.length-1].setValid(false);
+                        }
+                        else {
+                            actionList[actionList.length-1].directObject = contextNoun;
+                        }
                     }
                     else {
                         //TODO: Try to pull the sentence subject from the client context.
@@ -269,6 +276,14 @@ class UserInput {
     setActions(actionList) {
         console.log(actionList)
         this.actionList = actionList;
+    }
+
+    countActions() {
+        return this.actionList.length;
+    }
+
+    getAction(index) {
+        return this.actionList[index];
     }
 
     getActions() {

@@ -40,14 +40,25 @@ describe('Lexer Tests', () => {
 describe('Action Processor Tests', () => {
     it('should find verb', () => {
            var userInput = new UserInput("Give Hug to Orc then slap it")
-           assert.equal(true, true);
+           expect(userInput.countActions()).to.equal(2);
        });
-       it('should find verb', () => {
-        var userInput = new UserInput("Hug the Orc")
-        assert.equal(true, true);
+    it('should take the sword', () => {
+        var userInput = new UserInput("Take the sword.")
+        expect(userInput.getAction(0).verb).to.equal("take");
+        expect(userInput.getAction(0).directObject).to.equal("sword");
     });
-    it('should replace personal pronouns', () => {
-        var userInput = new UserInput("Talk to the Orc and then slap them")
-        assert.equal(true, true);
+    it('should walk to old man', () => {
+        var userInput = new UserInput("Walk up to the old man.")
+        expect(userInput.getAction(0).verb).to.equal("walk");
+        expect(userInput.getAction(0).directObject).to.equal("man");
     });
+    it('should walk to old man', () => {
+        var userInput = new UserInput("Walk up to the old man.")
+        expect(userInput.getAction(0).verb).to.equal("walk");
+        expect(userInput.getAction(0).directObject).to.equal("man");
+    });
+    // it('should replace personal pronouns', () => {
+    //     var userInput = new UserInput("Talk to the Orc and then slap them")
+    //     assert.equal(true, true);
+    // });
 });

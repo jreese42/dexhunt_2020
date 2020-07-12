@@ -3,24 +3,34 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var fs = require('fs');
+var pug = require('pug');
 
 const WebSocket = require('ws');
+var WebSocketServer = require('./game/webSocketServer.js')
 
 var indexRouter = require('./routes/index');
 
 var app = express();
+var wss = new WebSocketServer()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Pug for Client side
+// Compile the client templates function strings, output functions into a client-side js script
+var jsFunctionString = pug.compileFileClient('views/client/ui_gameTurn.pug', {name: "render_gameTurn"});
+fs.writeFileSync("public/javascripts/templates.js", jsFunctionString);
+
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/assets', express.static(__dirname + 'node_modules/xterm/lib'));
+app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist'))); // redirect JS jQuery
+app.use(express.static(path.join(__dirname, 'node_modules/vorple/dist'))); //Vorple
 
 app.use('/', indexRouter);
 
