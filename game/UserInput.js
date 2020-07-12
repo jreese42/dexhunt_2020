@@ -149,18 +149,70 @@ class PlayerAction {
         this.verb = ""
         this.directObject = ""
         this.indirectObject = ""
+        this.valid = true;
+    }
+
+    setValid(valid) {
+        this.valid = valid;
+    }
+
+    isValid() {
+        return this.isValid;
     }
 }
 
 class ActionProcessor {
     constructor() {
+        this._coordAdverbs = ["then"]; //TODO: Fix this. "then" in this._coordAdverbs === false 
     }
 
-    processActions() {
+    processActions(partsOfSpeech) {
         //split on Coordinating conjunctions or Conjunctive adverbs (then)
-        //find verb, nouns
-        
-
+        //replace PRP with reference to direct object
+        var actionList = [new PlayerAction()]
+        partsOfSpeech.forEach(posEntry => {
+            var word = posEntry[0];
+            var pos = posEntry[1];
+            console.log("then" in this._coordAdverbs);
+            if (pos == PartOfSpeech.COORD_CUNJUNCTION || (word in this._coordAdverbs)) {
+                actionList.push(new PlayerAction())
+            }
+            else {
+                if (pos == PartOfSpeech.VERB || pos == PartOfSpeech.VERB_PRESENT || pos == PartOfSpeech.VERB_PRESENT_P) {
+                    if (actionList[actionList.length-1].verb) {
+                        actionList[actionList.length-1].setValid(false); //Can't have 2 verbs
+                        console.log("Processing failed because multiple verbs were found.")
+                    }
+                    else {
+                        actionList[actionList.length-1].verb = word;
+                    }
+                }
+                if (pos == PartOfSpeech.NOUN || pos == PartOfSpeech.NOUN_PLURAL || pos == PartOfSpeech.NOUN_PROPER_SINGLE || pos == PartOfSpeech.NOUN_PROPER_PLURAL) {
+                    if (actionList[actionList.length-1].directObject && actionList[actionList.length-1].indirectObject) {
+                        console.log("Dropping noun ", word, " because two nouns were already found.")
+                    }
+                    else if (actionList[actionList.length-1].directObject) {
+                        actionList[actionList.length-1].indirectObject = word;
+                    }
+                    else {
+                        actionList[actionList.length-1].directObject = word;
+                    }
+                }
+                if (pos == PartOfSpeech.PRONOUN_PERSONAL) {
+                    //Assume the personal pronoun reference to the direct object of the previous clause
+                    if (actionList.length > 1) {
+                        actionList[actionList.length-1].directObject = actionList[actionList.length-2].directObject;
+                    }
+                    else {
+                        //TODO: Try to pull the sentence subject from the client context.
+                        //They're probably responding to the previous prompt e.g. "There is a sword on the ground." => "Pick it up."
+                        //Not sure what this PRP refers to
+                        actionList[actionList.length-1].setValid(false);
+                    }
+                }
+            }
+        });
+        return actionList;
     }
 }
 

@@ -39,11 +39,15 @@ describe('Lexer Tests', () => {
 
 describe('Action Processor Tests', () => {
     it('should find verb', () => {
-           var userInput = new UserInput("Give Hug to Orc then slap him")
+           var userInput = new UserInput("Give Hug to Orc then slap it")
            assert.equal(true, true);
        });
        it('should find verb', () => {
         var userInput = new UserInput("Hug the Orc")
+        assert.equal(true, true);
+    });
+    it('should replace personal pronouns', () => {
+        var userInput = new UserInput("Talk to the Orc and then slap them")
         assert.equal(true, true);
     });
 });
