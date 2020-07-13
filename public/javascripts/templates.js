@@ -24,7 +24,7 @@ pug_html = pug_html + "\u003Cdiv class=\"main\"\u003E";
 ;pug_debug_line = 7;pug_debug_filename = "views\u002Fclient\u002Fui_gameTurn.pug";
 pug_html = pug_html + "\u003Cspan\u003E";
 ;pug_debug_line = 7;pug_debug_filename = "views\u002Fclient\u002Fui_gameTurn.pug";
-pug_html = pug_html + (pug_escape(null == (pug_interp = resultOutput) ? "" : pug_interp)) + "\u003C\u002Fspan\u003E";
+pug_html = pug_html + (null == (pug_interp = resultOutput) ? "" : pug_interp) + "\u003C\u002Fspan\u003E";
 ;pug_debug_line = 8;pug_debug_filename = "views\u002Fclient\u002Fui_gameTurn.pug";
 pug_html = pug_html + "\u003Cbr\u002F\u003E";
 ;pug_debug_line = 9;pug_debug_filename = "views\u002Fclient\u002Fui_gameTurn.pug";

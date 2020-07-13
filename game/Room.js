@@ -13,7 +13,7 @@ class Room {
 
         this.addAction(["look", "examine"], (playerObj) => {
             var response = new Messaging.ConsoleOutput();
-            response.setResponseText(this.getLongDescription());
+            response.setResponseText(this.getLongDescriptionWithObjects());
             return response;
         });
     }
@@ -27,7 +27,7 @@ class Room {
         //TODO handle multiple object with same name but a specifier like "east door"/"west door"
         for (var i = 0; i < this.interactables.length; i++) {
             var interactable = this.interactables[i];
-            if (interactable.testNoun(playerAction.directObject)) {
+            if (interactable.testNoun(playerAction.directObject)) { //TODO: Handle indirect object and qualifiers "stone table, western door"
                 var result = interactable.executeVerb(playerAction.verb, playerObj);
                 if (result)
                     return result;
@@ -65,6 +65,18 @@ class Room {
 
     getLongDescription() {
         return this.longDescription;
+    }
+
+    getLongDescriptionWithObjects() {
+        var descriptions = ""
+        descriptions += this.longDescription;
+
+        for (var i = 0; i < this.interactables.length; i++) {
+            var interactable = this.interactables[i];
+            descriptions += "<br><br>"
+            descriptions += interactable.getShortDescription();
+        }
+        return descriptions;
     }
 
     addAction(verbs, func) {

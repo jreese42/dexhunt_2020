@@ -5,10 +5,10 @@
 var Messaging = require('./Messaging.js');
 
 class Interactable {
-    constructor(primaryNoun) {
+    constructor(nouns) {
         this.shortDescription = "Object Description";
         this.longDescription = "Long Object Description";
-        this.nouns = [primaryNoun];
+        this.nouns = nouns;
         this.verbs = {}; //Map of verb => func(Player). Must return a Messaging.ConsoleOutput object.
 
         this.addAction(["look", "examine"], (playerObj) => {

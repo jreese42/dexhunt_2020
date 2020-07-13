@@ -11,7 +11,17 @@ $(function() {
             $(this).attr("disabled", "disabled");
             var data = {"playerInput": $(this).val()}
             console.log(data)
-            wss_send(data)
+            if ($(this).val()) {
+                wss_send(data);
+            }
+            else {
+                var turnData = {
+                    "playerInput": "",
+                    "resultOutput": "Enter some text.  Type 'help' for command list."
+                }
+                $('#vorple > .previousTurn').before(render_gameTurn(turnData));
+                $(document).scrollTop($(document).height());
+            }
             $(this).val('')
     
             //Enable the textbox again if needed.
@@ -63,6 +73,6 @@ function insertTurn(turnData) {
     console.log(turnData)
     if (!turnData.playerInput)
         turnData.hideUserInput = true;
-    console.log(turnData)
-    $('#vorple > .previousTurn').before(render_gameTurn(turnData))
+    $('#vorple > .previousTurn').before(render_gameTurn(turnData));
+    $(document).scrollTop($(document).height());
 }

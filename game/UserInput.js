@@ -127,10 +127,7 @@ class Tokenizer {
  */
 class Lexer {
     constructor() {
-        // this.lexer = new pos.Lexer()
-        // this.tagger = new pos.Tagger()
-        // this._initLexicon()
-        this.tagger = posTagger();
+        this.tagger = posTagger();  //TODO: Either need a better tagger or a big custom lexicon
         
         //Some lemmas are not properly tagged in short sentences as seen in a Text based adventure
         //Override the tagger on these specific tokens.
@@ -141,9 +138,6 @@ class Lexer {
     }
 
     lex(tokens) {
-        // var input = tokens.join(' ')
-        // var words = this.lexer.lex(input);
-        // var taggedWords = this.tagger.tag(words);
         var taggedWords = this.tagger.tagRawTokens(tokens);
         taggedWords = this._forceTags(taggedWords);
 
@@ -156,6 +150,7 @@ class Lexer {
             'Obama': [PartOfSpeech.NOUN_PROPER_SINGLE],
             'Use': [PartOfSpeech.VERB],
             'Open': [PartOfSpeech.VERB],
+            'key': [PartOfSpeech.NOUN],
         }
         this.tagger.updateLexicon(lexiconExtension);
     }
@@ -215,6 +210,7 @@ class ActionProcessor {
                         actionList[actionList.length-1].verb = word;
                     }
                 }
+                //TODO: Adjective/Noun chains.  In a chain of ADJ and NN, the rightmost is the noun and all others are clarifying ("west door")
                 if (pos == PartOfSpeech.NOUN || pos == PartOfSpeech.NOUN_PLURAL || pos == PartOfSpeech.NOUN_PROPER_SINGLE || pos == PartOfSpeech.NOUN_PROPER_PLURAL) {
                     contextNoun = word;
                     if (actionList[actionList.length-1].directObject && actionList[actionList.length-1].indirectObject) {
