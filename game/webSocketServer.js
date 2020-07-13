@@ -7,6 +7,7 @@ const WebSocket = require('ws');
 const Player = require('./Player');
 const UserInput = require('./UserInput');
 const World = require('./World.js');
+const Messaging = require('./Messaging.js');
 
 var world = new World();
 
@@ -38,6 +39,8 @@ class WebSocketServer {
         this.playerClients = []
         this.wss = new WebSocket.Server(wssOptions);
         this.wss.on('connection', this.onNewConnection.bind(this))
+        this.playerObj = new Player();
+        this.playerObj.currentRoom = world.getRoom(0); //room1
     }
 
     onNewConnection(webSocketClient) {
@@ -70,24 +73,34 @@ class WebSocketServer {
     }
 
     _processInitializationCommand(ws, data) {
-
-      var player = new Player();
-      player.currentRoom = world.getRoom(0); //room1
-      var userInput = new UserInput(data["playerInput"]);
+      var player = this.playerObj; //TODO: get specific player from game
+      var userInput = new UserInput(data["playerInput"]); //TODO: Verify data
       
-      var response = {};
-      response["playerInput"] = data["playerInput"];
+      var response = new Messaging.ServerMessage();
+      response.setPlayerInput(data["playerInput"]);
 
       if (data.playerId) {
-        //Initial command - send context to player
-        response["resultOutput"] = player.getCurrentRoom().getShortDescription();
-        return response;
+        //Initial command - send room context to player
+        var msg = new Messaging.ConsoleOutput();
+        msg.setResponseText(player.getCurrentRoom().getShortDescription());
+        response.appendConsoleOutput(msg);
       }
 
       //will need initialization of sockets later
       //for now just go straight through to command parsing
-      response["resultOutput"] = player.process_playerAction(userInput.getAction(0));
-      return response;
+      for (var i = 0; i < userInput.countActions(); i++) {
+        var msg = player.process_playerAction(userInput.getAction(i));
+        if (msg)
+          response.appendConsoleOutput(msg);
+      }
+
+      if (!response.hasConsoleOutput()) {
+        var msg = new Messaging.ConsoleOutput();
+        msg.setResponseText("I don't know what you mean.");
+        response.appendConsoleOutput(msg);
+      }
+
+      return response.toObject();
     }
 }
 

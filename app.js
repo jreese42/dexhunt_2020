@@ -30,7 +30,7 @@ fs.writeFileSync("public/javascripts/templates.js", jsFunctionString);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist'))); // redirect JS jQuery
-app.use(express.static(path.join(__dirname, 'node_modules/vorple/dist'))); //Vorple
+// app.use(express.static(path.join(__dirname, 'node_modules/vorple/dist'))); //Vorple
 
 app.use('/', indexRouter);
 

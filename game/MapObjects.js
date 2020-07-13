@@ -1,21 +1,12 @@
-//Nouns
-//Verbs
-//Description
-
-var Messaging = require('./Messaging.js');
-
-class Interactable {
+module.exports.Door = class Door {
+    //TODO
     constructor(primaryNoun) {
         this.shortDescription = "Object Description";
         this.longDescription = "Long Object Description";
         this.nouns = [primaryNoun];
-        this.verbs = {}; //Map of verb => func(Player). Must return a Messaging.ConsoleOutput object.
+        this.verbs = {}; //Map of verb => func(Player). Must return a ServerResponse object.
 
-        this.addAction(["look", "examine"], (playerObj) => {
-            var response = new Messaging.ConsoleOutput();
-            response.setResponseText(this.getLongDescription());
-            return response;
-        });
+        this.addAction(["use", "open"], )
     }
 
     getShortDescription() {
@@ -58,5 +49,3 @@ class Interactable {
         return null;
     }
 }
-
-module.exports = Interactable;

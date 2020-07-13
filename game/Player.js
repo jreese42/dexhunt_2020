@@ -8,7 +8,7 @@
 //sequelize binding
 // var Room = require('Room');
 
-const { response } = require("express");
+var Messaging = require('./Messaging.js');
 
 class Player {
     constructor() {
@@ -18,14 +18,24 @@ class Player {
 
     process_playerAction(playerAction) {
         //return an output string or "" if not processed
-        var response = ""
+        var response = null;
         if (this.getCurrentRoom()) {
-            response = this.currentRoom.process_playerAction(playerAction);
-            if (response)
-                return response;
+            response = this.currentRoom.process_playerAction(playerAction, this);
         }
-        response = "PlayerAction: verb=" + playerAction.verb + " obj1=" + playerAction.directObject + " obj2=" + playerAction.indirectObject;
+        if (!response) {
+            //nothing responded
+            return null;
+        }
+        if (!response instanceof Messaging.ConsoleOutput) {
+            //unexpected response type
+            console.log("Unexpected response type to PlayerAction");
+            return null;
+        }
         return response;
+    }
+
+    setCurrentRoom(roomObj) {
+        this.currentRoom = roomObj;
     }
 
     getCurrentRoom() {

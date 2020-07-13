@@ -1,6 +1,7 @@
 .turn
-    span.vorplePrompt &gt; 
-    span.previousCommand #{playerInput}
+    if !hideUserInput
+        span.vorplePrompt &gt; 
+        span.previousCommand #{playerInput}
     .turnContent
         .main
             span #{resultOutput}
