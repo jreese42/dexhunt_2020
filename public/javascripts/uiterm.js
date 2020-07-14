@@ -39,9 +39,7 @@ function setupWssSocket(gameId) {
 
 function openWssSocket() {
     var HOST = location.origin.replace(/^http/, 'ws');
-    console.log(HOST)
-    // ws = new WebSocket('ws://localhost:33053'); //Local dev
-    ws = new WebSocket(HOST); //Production
+    ws = new WebSocket(HOST);
     ws.onmessage = function (ev) {
         console.log(ev.data)
         processServerMessage(ev.data);
