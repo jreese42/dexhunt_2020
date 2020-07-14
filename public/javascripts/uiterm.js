@@ -38,8 +38,10 @@ function setupWssSocket(gameId) {
 }
 
 function openWssSocket() {
+    var HOST = location.origin.replace(/^http/, 'ws');
+    console.log(HOST)
     // ws = new WebSocket('ws://localhost:33053'); //Local dev
-    ws = new WebSocket('ws://adc-dex-hunt-2020.herokuapp.com:33053'); //Production
+    ws = new WebSocket(HOST); //Production
     ws.onmessage = function (ev) {
         console.log(ev.data)
         processServerMessage(ev.data);

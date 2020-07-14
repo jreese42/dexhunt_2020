@@ -7,12 +7,10 @@ var fs = require('fs');
 var pug = require('pug');
 
 const WebSocket = require('ws');
-var WebSocketServer = require('./game/webSocketServer.js')
 
 var indexRouter = require('./routes/index');
 
 var app = express();
-var wss = new WebSocketServer()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
