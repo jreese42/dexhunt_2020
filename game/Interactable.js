@@ -3,26 +3,42 @@
 //Description
 
 class Interactable {
-    constructor(primaryNoun) {
+    constructor(adjectivesList, nounsList) {
+        this.objectId = 0;
         this.shortDescription = "Object Description";
         this.longDescription = "Long Object Description";
-        this.nouns = [primaryNoun];
+        this.nouns = nounsList;
+        this.adjectives = adjectivesList;
         this.verbs = {}; //Map of verb => func(Player). Should return a command output string.
     }
 
-    getShortDescription() {
+    scorePlayerAction(playerAction) {
+        var score = 0;
+        playerAction.getTokens().forEach(token => {
+            if (this.nouns && this.nouns.includes(token))
+                score += 1;
+            if (this.adjectives && this.adjectives.includes(token))
+                score += 1;
+            if (this.verbs && this.verbs.includes(token))
+                score += 1;                
+        });
+        return score;
+    }
+
+
+    get shortDescription() {
         return this.shortDescription;
     }
 
-    setShortDescription(description) {
+    set shortDescription(description) {
         this.shortDescription = description;
     }
 
-    getLongDescription() {
+    get longDescription() {
         return this.longDescription;
     }
 
-    setLongDescription(description) {
+    set longDescription(description) {
         this.longDescription = description;
     }
     

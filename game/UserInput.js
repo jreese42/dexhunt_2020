@@ -3,13 +3,6 @@
  * Contains data about a line of input from a user.
  */
 
-//string
-//tokens
-//parts of speech
-//verb
-//noun primary
-//noun secondary
-
 var pos = require('pos');
 
 //For "pos" package, from https://www.npmjs.com/package/parts-of-speech
@@ -73,7 +66,6 @@ class Tokenizer {
             "e": "east",
             "s": "south",
             "w": "west",
-            "open": "use",
         }
         this._conjunctivePairs = {
             "and then": "and", //simplify conjuctive phrasing
@@ -149,79 +141,100 @@ class Lexer {
 }
 
 class PlayerAction {
-    constructor() {
-        this.verb = ""
-        this.directObject = ""
-        this.indirectObject = ""
-        this.valid = true;
+    constructor(tokens) {
+        this.tokens = tokens;
+
+        this.currentParserScore = 0;
+        this.bestParserObjectId = -1;
     }
 
-    setValid(valid) {
-        this.valid = valid;
+    getTokens() {
+        return this.tokens;
     }
 
-    isValid() {
-        return this.isValid;
+    getCurrentParserScore() {
+        return this.currentParserScore;
+    }
+
+    getCurrentParserObjectId() {
+        return this.bestParserObjectId;
+    }
+    
+    setParserObjectIfBetter(score, objId) {
+        if (score > this.getCurrentParserScore()) {
+            this.currentParserScore = score;
+            this.bestParserObjectId = objId;
+        }
     }
 }
 
 class ActionProcessor {
     constructor() {
-        this._coordAdverbs = ["then"]; 
+        this._conjunctiveTokens = ["and", "then"]; 
     }
 
-    processActions(partsOfSpeech) {
+    processActions(tokens) {
         var contextNoun = "";
-        //split on Coordinating conjunctions or Conjunctive adverbs (then)
-        //replace PRP with reference to direct object
+        //split on Coordinating conjunctions or Conjunctive adverbs (and, then)
+        //split the tokens into distinct actions that will be processed in order
         var actionList = [new PlayerAction()]
-        partsOfSpeech.forEach(posEntry => {
-            var word = posEntry[0];
-            var pos = posEntry[1];
-            if (pos == PartOfSpeech.COORD_CUNJUNCTION || (this._coordAdverbs.includes(word))) {
-                actionList.push(new PlayerAction())
-            }
-            else {
-                if (pos == PartOfSpeech.VERB || pos == PartOfSpeech.VERB_PRESENT || pos == PartOfSpeech.VERB_PRESENT_P) {
-                    if (actionList[actionList.length-1].verb) {
-                        actionList[actionList.length-1].setValid(false); //Can't have 2 verbs
-                        console.log("Processing failed because multiple verbs were found.")
-                    }
-                    else {
-                        actionList[actionList.length-1].verb = word;
+        tokens.forEach(token => {
+                if (this._conjunctiveTokens.includes(token)) {
+                    if (actionList[actionList.length-1].tokens.length > 0) {
+                        actionList.push(new PlayerAction());
                     }
                 }
-                if (pos == PartOfSpeech.NOUN || pos == PartOfSpeech.NOUN_PLURAL || pos == PartOfSpeech.NOUN_PROPER_SINGLE || pos == PartOfSpeech.NOUN_PROPER_PLURAL) {
-                    contextNoun = word;
-                    if (actionList[actionList.length-1].directObject && actionList[actionList.length-1].indirectObject) {
-                        console.log("Dropping noun ", word, " because two nouns were already found.")
-                    }
-                    else if (actionList[actionList.length-1].directObject) {
-                        actionList[actionList.length-1].indirectObject = word;
-                    }
-                    else {
-                        actionList[actionList.length-1].directObject = word;
-                    }
+                else {
+                    actionList[actionList.length-1].tokens.push(token);
                 }
-                if (pos == PartOfSpeech.PRONOUN_PERSONAL) {
-                    //Assume the personal pronoun reference to the direct object of the previous clause
-                    if (actionList.length > 1) {
-                        if (!contextNoun) {
-                            actionList[actionList.length-1].setValid(false);
-                        }
-                        else {
-                            actionList[actionList.length-1].directObject = contextNoun;
-                        }
-                    }
-                    else {
-                        //TODO: Try to pull the sentence subject from the client context.
-                        //They're probably responding to the previous prompt e.g. "There is a sword on the ground." => "Pick it up."
-                        //Not sure what this PRP refers to
-                        actionList[actionList.length-1].setValid(false);
-                    }
-                }
-            }
         });
+        // partsOfSpeech.forEach(posEntry => {
+        //     var word = posEntry[0];
+        //     var pos = posEntry[1];
+        //     if (pos == PartOfSpeech.COORD_CUNJUNCTION || (this._coordAdverbs.includes(word))) {
+        //         actionList.push(new PlayerAction())
+        //     }
+        //     else {
+        //         if (pos == PartOfSpeech.VERB || pos == PartOfSpeech.VERB_PRESENT || pos == PartOfSpeech.VERB_PRESENT_P) {
+        //             if (actionList[actionList.length-1].verb) {
+        //                 actionList[actionList.length-1].setValid(false); //Can't have 2 verbs
+        //                 console.log("Processing failed because multiple verbs were found.")
+        //             }
+        //             else {
+        //                 actionList[actionList.length-1].verb = word;
+        //             }
+        //         }
+        //         if (pos == PartOfSpeech.NOUN || pos == PartOfSpeech.NOUN_PLURAL || pos == PartOfSpeech.NOUN_PROPER_SINGLE || pos == PartOfSpeech.NOUN_PROPER_PLURAL) {
+        //             contextNoun = word;
+        //             if (actionList[actionList.length-1].directObject && actionList[actionList.length-1].indirectObject) {
+        //                 console.log("Dropping noun ", word, " because two nouns were already found.")
+        //             }
+        //             else if (actionList[actionList.length-1].directObject) {
+        //                 actionList[actionList.length-1].indirectObject = word;
+        //             }
+        //             else {
+        //                 actionList[actionList.length-1].directObject = word;
+        //             }
+        //         }
+        //         if (pos == PartOfSpeech.PRONOUN_PERSONAL) {
+        //             //Assume the personal pronoun reference to the direct object of the previous clause
+        //             if (actionList.length > 1) {
+        //                 if (!contextNoun) {
+        //                     actionList[actionList.length-1].setValid(false);
+        //                 }
+        //                 else {
+        //                     actionList[actionList.length-1].directObject = contextNoun;
+        //                 }
+        //             }
+        //             else {
+        //                 //TODO: Try to pull the sentence subject from the client context.
+        //                 //They're probably responding to the previous prompt e.g. "There is a sword on the ground." => "Pick it up."
+        //                 //Not sure what this PRP refers to
+        //                 actionList[actionList.length-1].setValid(false);
+        //             }
+        //         }
+        //     }
+        // });
         return actionList;
     }
 }
@@ -230,8 +243,9 @@ class UserInput {
     constructor(rawString) {
         this.setRawString(rawString)
         this.setTokens(this._getTokenizer().tokenize(this.getRawString())) //Break string into tokens and make some substitutions
-        this.setPartsOfSpeech(this._getLexer().lex(this.getTokens())) //Process parts of speech
-        this.setActions(this._getActionProcessor().processActions(this.getPartsOfSpeech())) //Convert parts of speech into actions
+        // this.setPartsOfSpeech(this._getLexer().lex(this.getTokens())) //Process parts of speech
+        // this.setActions(this._getActionProcessor().processActions(this.getPartsOfSpeech())) //Convert parts of speech into actions
+        this.setActions(this._getActionProcessor().processActions(this.getTokens())) //Convert tokens into actions
     }
 
     /** Get access to static class member */
@@ -304,3 +318,8 @@ UserInput.actionProcessor = new ActionProcessor();
 //Two actions conjoined with Corridinating Conjunction "CC"
 
 module.exports = UserInput
+
+/* Verb Groups are utilities for handling similar verbs within actions */
+module.exports.VerbGroup.USE = ['use', 'open']
+module.exports.VerbGroup.LOOK = ['look', 'examine', 'inspect']
+module.exports.VerbGroup.TAKE = ['take', 'get']
