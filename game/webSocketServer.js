@@ -6,11 +6,11 @@
 const WebSocket = require('ws');
 const Player = require('./Player');
 const UserInput = require('./UserInput');
-const World = require('./World.js');
 const Messaging = require('./Messaging.js');
 const app = require('../app');
-
-var world = new World();
+const World = require('./World.js'); //Causes world to be created
+const Globals = require('./Globals.js');
+Globals.setWorld(new World());
 
 class WebSocketServer {
     constructor(wssOptions) {
@@ -18,7 +18,6 @@ class WebSocketServer {
         this.wss = new WebSocket.Server(wssOptions);
         this.wss.on('connection', this.onNewConnection.bind(this))
         this.playerObj = new Player();
-        this.playerObj.currentRoom = world.getRoom(0); //room1
     }
 
     onNewConnection(webSocketClient) {
@@ -58,6 +57,8 @@ class WebSocketServer {
       response.setPlayerInput(data["playerInput"]);
 
       if (data.playerId) {
+        //Debugging: Reset player to first room every time they refresh
+        this.playerObj.currentRoom = Globals.getWorld().getRoomByRoomNumber(0); //room1
         //Initial command - send room context to player
         var msg = new Messaging.ConsoleOutput();
         msg.setResponseText(player.getCurrentRoom().shortDescription);

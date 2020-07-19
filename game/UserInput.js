@@ -249,7 +249,6 @@ class UserInput {
     }
 
     setTokens(tokens) {
-        console.log(tokens)
         this.tokens = tokens;
     }
 
@@ -267,7 +266,6 @@ class UserInput {
     }
 
     setActions(actionList) {
-        console.log(actionList)
         this.actionList = actionList;
     }
 
@@ -293,7 +291,7 @@ UserInput.VerbGroup = {}
 UserInput.VerbGroup.USE = ['use', 'open']
 UserInput.VerbGroup.LOOK = ['look', 'examine', 'inspect']
 UserInput.VerbGroup.TAKE = ['take', 'get']
-UserInput.VerbGroup.GO = ['go', 'use']
+UserInput.VerbGroup.GO = ['go', 'enter', 'use']
 
 //Tenses to check
 //"Give Hug to Orc" => Verb Give, Hug is nounPrimary, Orc is nounSecondary assumed by "TO"

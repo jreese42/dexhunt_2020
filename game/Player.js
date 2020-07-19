@@ -17,6 +17,7 @@ class Player {
         /* The player context is a "scratchpad" for any data storage.  Any Interactable or Room can access, modify, or delete this data.
          * This data is not stored in the database.  Objects may use this structure to share game state but must not rely on the data being avaiable. */
         this.playerContext = {};
+        //TODO: Add Team context too
         this.currentRoom = null;
     }
 
@@ -53,6 +54,16 @@ class Player {
 
     getCurrentRoom() {
         return this.currentRoom;
+    }
+
+    setPlayerContextValue(key, value) {
+        this.playerContext[key] = value;
+    }
+    
+    getPlayerContextValue(key) {
+        if (key in this.playerContext)
+            return this.playerContext[key];
+        return null;
     }
 
 }

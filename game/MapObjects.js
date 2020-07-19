@@ -1,51 +1,37 @@
-module.exports.Door = class Door {
-    //TODO
-    constructor(primaryNoun) {
-        this.shortDescription = "Object Description";
-        this.longDescription = "Long Object Description";
-        this.nouns = [primaryNoun];
-        this.verbs = {}; //Map of verb => func(Player). Must return a ServerResponse object.
+const Interactable = require("./Interactable");
+const UserInput = require("./UserInput.js");
+const Messaging = require("./Messaging.js");
+const Globals = require("./Globals.js");
 
-        this.addAction(["use", "open"], )
-    }
+module.exports.Door = class Door extends Interactable {
+    constructor(adjectivesList, nounsList, destRoomId) {
+        super(adjectivesList, nounsList);
+        this.shortDescription = "Door Description";
+        this.longDescription = "Long Door Description";
+        this._destRoomId = destRoomId;
+        this._useDoorDescription = "";
 
-    getShortDescription() {
-        return this.shortDescription;
-    }
+        this.addAction(UserInput.VerbGroup.GO, (playerObj) => {
+            var response = new Messaging.ConsoleOutput();
+            var newRoom = Globals.getWorld().getRoomByRoomNumber(this._destRoomId);
+            if (!newRoom) {
+                response.setResponseText("You open the door, but there's just a wall behind it.  That doesn't seem right...");
+                return response;
+            }
 
-    setShortDescription(description) {
-        this.shortDescription = description;
-    }
+            playerObj.setCurrentRoom(newRoom);
 
-    getLongDescription() {
-        return this.longDescription;
-    }
-
-    setLongDescription(description) {
-        this.longDescription = description;
-    }
-    
-    addNoun(newNoun) {
-        this.nouns.push(newNoun);
+            response.setClearScreen(true);
+            response.setResponseText(this._useDoorDescription + " " + playerObj.getCurrentRoom().shortDescription);
+            return response;
+        });
     }
 
-    testNoun(noun) {
-        return (this.nouns.includes(noun));
+    get onUseDescription() {
+        return this._useDoorDescription;
     }
 
-    addAction(verbs, func) {
-        verbs.forEach((verb) => {
-            this.verbs[verb] = func;
-        })
-    }
-    
-    testVerb(verb) {
-        return (this.verbs.hasOwnProperty(verb));
-    }
-
-    executeVerb(verb, playerObj) {
-        if (this.testVerb(verb))
-            return this.verbs[verb](playerObj)
-        return null;
+    set onUseDescription(description) {
+        this._useDoorDescription = description;
     }
 }

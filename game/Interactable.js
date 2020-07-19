@@ -2,8 +2,8 @@
 //Verbs
 //Description
 
-var Messaging = require('./Messaging.js');
-var Globals = require('./Globals.js');
+const Messaging = require('./Messaging.js');
+const Globals = require('./Globals.js');
 
 class Interactable {
     constructor(adjectivesList, nounsList) {
@@ -153,6 +153,7 @@ class Interactable {
                 tokens.splice(i, 1);
             }
         }
+        //Must match a verb to be able to process it
         if (!verb) {
             response = new Messaging.ConsoleOutput();
             response.setResponseText("What are you trying to do?");
