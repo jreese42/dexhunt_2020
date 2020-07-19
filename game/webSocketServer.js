@@ -60,7 +60,7 @@ class WebSocketServer {
       if (data.playerId) {
         //Initial command - send room context to player
         var msg = new Messaging.ConsoleOutput();
-        msg.setResponseText(player.getCurrentRoom().getShortDescription());
+        msg.setResponseText(player.getCurrentRoom().shortDescription);
         response.appendConsoleOutput(msg);
       }
 

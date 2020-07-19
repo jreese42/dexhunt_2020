@@ -6,7 +6,6 @@
     //actionableNoun
 //GameState
 //sequelize binding
-// var Room = require('Room');
 
 var Messaging = require('./Messaging.js');
 
@@ -24,19 +23,18 @@ class Player {
     process_playerAction(playerAction) {
         //return an output string or "" if not processed
         var response = null;
-        if (playerAction.verb == 'help' && playerAction.directObject == "") {
-            response = new Messaging.ConsoleOutput();
-            response.setResponseText(helpText);
-            return response;
-        }
-        if ((playerAction.verb == 'look' || playerAction.verb == "use" || playerAction.verb == "") && playerAction.directObject == "inventory") {
-            response = new Messaging.ConsoleOutput();
-            response.setResponseText(tempInventoryPlaceholderText);
-            return response;
-        }
         if (this.getCurrentRoom()) {
-            response = this.currentRoom.process_playerAction(playerAction, this);
+            this.currentRoom.scorePlayerAction(playerAction) //Sets objectId in playerAction
+            if (playerAction.getCurrentParserScore() == 0) {
+                //No world object was found that can process this input
+                return null;
+            }
+            if (playerAction.getCurrentParserObjectId() != 0) {
+                var interactableObject = this.currentRoom.findObjectById(playerAction.getCurrentParserObjectId());
+                response = interactableObject.process_playerAction(playerAction, this);
+            }
         }
+
         if (!response) {
             //nothing responded
             return null;

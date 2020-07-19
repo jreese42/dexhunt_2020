@@ -159,11 +159,15 @@ class Lexer {
 }
 
 class PlayerAction {
-    constructor(tokens) {
-        this.tokens = tokens;
+    constructor() {
+        this.tokens = [];
 
         this.currentParserScore = 0;
         this.bestParserObjectId = -1;
+    }
+
+    pushToken(token) {
+        this.tokens.push(token);
     }
 
     getTokens() {
@@ -197,62 +201,16 @@ class ActionProcessor {
         //split the tokens into distinct actions that will be processed in order
         var actionList = [new PlayerAction()]
         tokens.forEach(token => {
-                if (this._conjunctiveTokens.includes(token)) {
-                    if (actionList[actionList.length-1].tokens.length > 0) {
-                        actionList.push(new PlayerAction());
-                    }
+            if (this._conjunctiveTokens.includes(token)) {
+                if (actionList[actionList.length-1].tokens.length > 0) {
+                    actionList.push(new PlayerAction());
                 }
-                else {
-                    actionList[actionList.length-1].tokens.push(token);
-                }
+            }
+            else {
+                actionList[actionList.length-1].pushToken(token);
+            }
         });
-        // partsOfSpeech.forEach(posEntry => {
-        //     var word = posEntry[0];
-        //     var pos = posEntry[1];
-        //     if (pos == PartOfSpeech.COORD_CUNJUNCTION || (this._coordAdverbs.includes(word))) {
-        //         actionList.push(new PlayerAction())
-        //     }
-        //     else {
-        //         if (pos == PartOfSpeech.VERB || pos == PartOfSpeech.VERB_PRESENT || pos == PartOfSpeech.VERB_PRESENT_P) {
-        //             if (actionList[actionList.length-1].verb) {
-        //                 actionList[actionList.length-1].setValid(false); //Can't have 2 verbs
-        //                 console.log("Processing failed because multiple verbs were found.")
-        //             }
-        //             else {
-        //                 actionList[actionList.length-1].verb = word;
-        //             }
-        //         }
-        //         if (pos == PartOfSpeech.NOUN || pos == PartOfSpeech.NOUN_PLURAL || pos == PartOfSpeech.NOUN_PROPER_SINGLE || pos == PartOfSpeech.NOUN_PROPER_PLURAL) {
-        //             contextNoun = word;
-        //             if (actionList[actionList.length-1].directObject && actionList[actionList.length-1].indirectObject) {
-        //                 console.log("Dropping noun ", word, " because two nouns were already found.")
-        //             }
-        //             else if (actionList[actionList.length-1].directObject) {
-        //                 actionList[actionList.length-1].indirectObject = word;
-        //             }
-        //             else {
-        //                 actionList[actionList.length-1].directObject = word;
-        //             }
-        //         }
-        //         if (pos == PartOfSpeech.PRONOUN_PERSONAL) {
-        //             //Assume the personal pronoun reference to the direct object of the previous clause
-        //             if (actionList.length > 1) {
-        //                 if (!contextNoun) {
-        //                     actionList[actionList.length-1].setValid(false);
-        //                 }
-        //                 else {
-        //                     actionList[actionList.length-1].directObject = contextNoun;
-        //                 }
-        //             }
-        //             else {
-        //                 //TODO: Try to pull the sentence subject from the client context.
-        //                 //They're probably responding to the previous prompt e.g. "There is a sword on the ground." => "Pick it up."
-        //                 //Not sure what this PRP refers to
-        //                 actionList[actionList.length-1].setValid(false);
-        //             }
-        //         }
-        //     }
-        // });
+
         return actionList;
     }
 }
@@ -330,6 +288,13 @@ UserInput.tokenizer = new Tokenizer();
 UserInput.lexer = new Lexer();
 UserInput.actionProcessor = new ActionProcessor();
 
+/* Verb Groups are utilities for handling similar verbs within actions */
+UserInput.VerbGroup = {}
+UserInput.VerbGroup.USE = ['use', 'open']
+UserInput.VerbGroup.LOOK = ['look', 'examine', 'inspect']
+UserInput.VerbGroup.TAKE = ['take', 'get']
+UserInput.VerbGroup.GO = ['go', 'use']
+
 //Tenses to check
 //"Give Hug to Orc" => Verb Give, Hug is nounPrimary, Orc is nounSecondary assumed by "TO"
 //"Hug the Orc" => No verb so assume Give. Hug is nounPrimary, Orc is nounSecondary assumed by "DT"
@@ -337,7 +302,3 @@ UserInput.actionProcessor = new ActionProcessor();
 
 module.exports = UserInput
 
-/* Verb Groups are utilities for handling similar verbs within actions */
-module.exports.VerbGroup.USE = ['use', 'open']
-module.exports.VerbGroup.LOOK = ['look', 'examine', 'inspect']
-module.exports.VerbGroup.TAKE = ['take', 'get']
