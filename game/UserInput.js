@@ -3,13 +3,14 @@
  * Contains data about a line of input from a user.
  */
 
-var pos = require('pos');
+var posTagger = require( 'wink-pos-tagger' );
 
 //For "pos" package, from https://www.npmjs.com/package/parts-of-speech
 const PartOfSpeech = {
     COORD_CUNJUNCTION: "CC", //and,but,or
     CARDINAL_NUM: "CD", //one,two
     DETERMINER: "DT", //the,some
+    PREDETERMINER: "PDT", //all, both
     EXISTENTIAL_THERE: "EX", //there
     FOREIGN_WORD: "FW", //mon dieu
     PREOPSITION: "IN", //of,in,by
@@ -23,8 +24,7 @@ const PartOfSpeech = {
     NOUN_PROPER_PLURAL: "NNPS", //Smiths
     NOUN_PLURAL: "NNS", //dogs
     POSSESSIVE_END: "POS", //�s
-    PREDETERMINER: "PDT", //all, both
-    PRONOUN_POSESSIVE: "PP", //my,one�s
+    PRONOUN_POSESSIVE: "PRP$", //my,one�s
     PRONOUN_PERSONAL: "PRP", //I,you,she
     ADV: "RB", //quickly
     ADV_COMPARATIVE: "RBR", //faster
@@ -38,19 +38,21 @@ const PartOfSpeech = {
     VERB_GERUND: "VBG", //eating
     VERB_PAST_PARTICIPLE: "VBN", //eaten
     VERB_PRESENT: "VBP", //eat
-    VERB_PRESENT_P: "VBZ", //eats
+    VERB_PRESENT_THIRD: "VBZ", //eats
     WH_DETERMINER: "WDT", //which,that
     WH_PRONOUN: "WP", //who,what
-    WH_POSSESIVE: "WP", //whose
+    WH_POSSESIVE: "WP$", //whose
     WH_ADV: "WRB", //how,where
     COMMA: ",", //,
     PUNCT_SENTENCE_FINAL: ".", //. ! ?
     PUNCT_MID_SENTENCE: ":", //: ; �
-    DOLLAR: "$", //$
+    DOLLAR: "$", //$, €, £, ¥
     POUND: "#", //#
     QUOTE: "\"", //"
     LEFT_PAREN: "(", //(
     RIGHT_PAREN: ")", //)
+    EXPLETIVE_THERE: "EX", //there
+    EMOJI: "EM", //:), <emoji>
 }
 
 
@@ -117,15 +119,19 @@ class Tokenizer {
  */
 class Lexer {
     constructor() {
-        this.lexer = new pos.Lexer()
-        this.tagger = new pos.Tagger()
-        this._initLexicon()
+        this.tagger = posTagger();  //TODO: Either need a better tagger or a big custom lexicon
+        
+        //Some lemmas are not properly tagged in short sentences as seen in a Text based adventure
+        //Override the tagger on these specific tokens.
+        //This means that these lemmas are forced into a specific context and cannot be used in any other english usage.
+        this._forcedTags = {
+            "use": PartOfSpeech.VERB,
+        }
     }
 
     lex(tokens) {
-        var input = tokens.join(' ')
-        var words = this.lexer.lex(input);
-        var taggedWords = this.tagger.tag(words);
+        var taggedWords = this.tagger.tagRawTokens(tokens);
+        taggedWords = this._forceTags(taggedWords);
 
         return taggedWords;
     }
@@ -135,8 +141,20 @@ class Lexer {
         var lexiconExtension = {
             'Obama': [PartOfSpeech.NOUN_PROPER_SINGLE],
             'Use': [PartOfSpeech.VERB],
+            'Open': [PartOfSpeech.VERB],
+            'key': [PartOfSpeech.NOUN],
         }
-        this.tagger.extendLexicon(lexiconExtension);
+        this.tagger.updateLexicon(lexiconExtension);
+    }
+
+    _forceTags(taggedWords) {
+
+        taggedWords.forEach((posEntry) => {
+            if (posEntry.lemma in this._forcedTags) {
+                posEntry.pos = this._forcedTags[posEntry.lemma];
+            }
+        });
+        return taggedWords;
     }
 }
 

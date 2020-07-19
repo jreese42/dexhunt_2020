@@ -2,6 +2,8 @@
 //Verbs
 //Description
 
+var Messaging = require('./Messaging.js');
+
 class Interactable {
     constructor(adjectivesList, nounsList) {
         this.objectId = 0;
@@ -10,6 +12,12 @@ class Interactable {
         this.nouns = nounsList;
         this.adjectives = adjectivesList;
         this.verbs = {}; //Map of verb => func(Player). Should return a command output string.
+        
+        this.addAction(["look", "examine"], (playerObj) => {
+            var response = new Messaging.ConsoleOutput();
+            response.setResponseText(this.getLongDescription());
+            return response;
+        });
     }
 
     scorePlayerAction(playerAction) {
@@ -47,20 +55,22 @@ class Interactable {
     }
 
     testNoun(noun) {
-        return (noun in this.nouns);
+        return (this.nouns.includes(noun));
     }
 
-    addVerb(verb, func) {
-        this.verbs[verb] = func;
+    addAction(verbs, func) {
+        verbs.forEach((verb) => {
+            this.verbs[verb] = func;
+        })
     }
     
     testVerb(verb) {
-        return (verb in this.verbs);
+        return (this.verbs.hasOwnProperty(verb));
     }
 
-    executeVerb(verb) {
+    executeVerb(verb, playerObj) {
         if (this.testVerb(verb))
-            return this.verbs[verb]()
+            return this.verbs[verb](playerObj)
         return null;
     }
 }

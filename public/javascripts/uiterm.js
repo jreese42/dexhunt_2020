@@ -11,19 +11,18 @@ $(function() {
             $(this).attr("disabled", "disabled");
             var data = {"playerInput": $(this).val()}
             console.log(data)
-            wss_send(data)
+            if ($(this).val()) {
+                wss_send(data);
+            }
+            else {
+                var turnData = {
+                    "playerInput": "",
+                    "resultOutput": "Enter some text.  Type 'help' for command list."
+                }
+                $('#vorple > .previousTurn').before(render_gameTurn(turnData));
+                $(document).scrollTop($(document).height());
+            }
             $(this).val('')
-            // $.post({
-            //     url: "/api/lookupGame/" + $(this).val()
-            // })
-            // .done(function(data) {
-            //     console.log(data)
-            //     if (!data.gameId) {
-            //         console.log("Couldn't find gameId in response.")
-            //         return
-            //     }
-            //     setupWssSocket_playerMode(data.gameId)
-            // })
     
             //Enable the textbox again if needed.
             $(this).removeAttr("disabled");
@@ -39,10 +38,11 @@ function setupWssSocket(gameId) {
 }
 
 function openWssSocket() {
-    ws = new WebSocket('ws://localhost:33053');
+    var HOST = location.origin.replace(/^http/, 'ws');
+    ws = new WebSocket(HOST);
     ws.onmessage = function (ev) {
         console.log(ev.data)
-        insertTurn(JSON.parse(ev.data));
+        processServerMessage(ev.data);
     }
 }
 
@@ -62,7 +62,18 @@ function wss_send(object) {
     ws.send(JSON.stringify(object))    
 }
 
+function processServerMessage(serverMessageJson) {
+    var dataObj = JSON.parse(serverMessageJson);
+    if (dataObj.console) {
+        insertTurn(dataObj.console);
+    }
+
+}
+
 function insertTurn(turnData) {
     console.log(turnData)
-    $('#vorple > .previousTurn').before(render_gameTurn(turnData))
+    if (!turnData.playerInput)
+        turnData.hideUserInput = true;
+    $('#vorple > .previousTurn').before(render_gameTurn(turnData));
+    $(document).scrollTop($(document).height());
 }

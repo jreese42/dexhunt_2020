@@ -7,12 +7,10 @@ var fs = require('fs');
 var pug = require('pug');
 
 const WebSocket = require('ws');
-var WebSocketServer = require('./game/webSocketServer.js')
 
 var indexRouter = require('./routes/index');
 
 var app = express();
-var wss = new WebSocketServer()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,7 +28,7 @@ fs.writeFileSync("public/javascripts/templates.js", jsFunctionString);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist'))); // redirect JS jQuery
-app.use(express.static(path.join(__dirname, 'node_modules/vorple/dist'))); //Vorple
+// app.use(express.static(path.join(__dirname, 'node_modules/vorple/dist'))); //Vorple
 
 app.use('/', indexRouter);
 
