@@ -57,6 +57,10 @@ r1_simonSays.longDescription = "The gnome eyes you menacingly.  You wouldn't dar
     r1_d1.onUseDescription = "You pull open the old wooden door and head to the south."
     r1_simonSays.addInteractable(r1_d1);
 
+    var r1_simonTheGnome = new Interactable([], ["simon", "gnome"]);
+    r1_simonTheGnome.longDescription = "The gnome stands on the northern end of the room.  He's old and cragged and you don't think you want to get on his bad side.";
+    r1_simonSays.addInteractable(r1_simonTheGnome);
+
     const r1_simonSays_restartText = "  Start over!<br><br>You feel a magical rush of energy propel you backward.  Your feet skid to a stop just before you hit the southern wall.";
     const r1_f1_simon = () => {
         //Check if players succeeded at last simon says state
@@ -167,8 +171,9 @@ r1_simonSays.longDescription = "The gnome eyes you menacingly.  You wouldn't dar
     r1_simonSays.addInteractable(r1_action_stepForwardMulti);
     
     //Move forward, specifically at the door or gnome
-    var r1_action_stepForwardDoor = new Interactable(["forward", "many", "two", "three", "four", "multiple", "several", "couple", "gilded", "north", "northern"], ["step", "steps", "door", "gnome", "Simon"]);
-    r1_action_stepForwardDoor.addAction(["walk", "move", "step", "take", "run"], (playerObj) => {
+    var r1_action_stepForwardDoor = new Interactable(["to", "toward", "many", "two", "three", "four", "multiple", "several", "couple", "gilded", "north", "northern"], ["step", "steps", "door", "gnome", "Simon"]);
+    r1_action_stepForwardDoor.addAction(["go", "walk", "move", "step", "take", "run"], (playerObj) => {
+        var response = new Messaging.ConsoleOutput();
         playerObj.setPlayerContextValue("r1_simonSays_progress", 0);
         playerObj.setPlayerContextValue("r1_simonSays_didMove", true);
         response.setResponseText("You start to move towards your target but the gnome snaps his eyes to you and points a finger in your direction.<br><br>Hey no fair, you gotta play the game!" + r1_simonSays_restartText);
