@@ -11,20 +11,7 @@ module.exports.Door = class Door extends Interactable {
         this._destRoomId = destRoomId;
         this._useDoorDescription = "";
 
-        this.addAction(UserInput.VerbGroup.GO, (playerObj) => {
-            var response = new Messaging.ConsoleOutput();
-            var newRoom = Globals.getWorld().getRoomByRoomNumber(this._destRoomId);
-            if (!newRoom) {
-                response.setResponseText("You open the door, but there's just a wall behind it.  That doesn't seem right...");
-                return response;
-            }
-
-            playerObj.setCurrentRoom(newRoom);
-
-            response.setClearScreen(true);
-            response.setResponseText(this._useDoorDescription + " " + playerObj.getCurrentRoom().shortDescription);
-            return response;
-        });
+        this.addAction(UserInput.VerbGroup.GO, this.onUseDoor.bind(this));
     }
 
     get onUseDescription() {
@@ -33,5 +20,22 @@ module.exports.Door = class Door extends Interactable {
 
     set onUseDescription(description) {
         this._useDoorDescription = description;
+    }
+
+    onUseDoor(playerObj) {
+        var response = new Messaging.ConsoleOutput();
+        var newRoom = Globals.getWorld().getRoomByRoomNumber(this._destRoomId);
+        if (!newRoom) {
+            response.setResponseText("You open the door, but there's just a wall behind it.  That doesn't seem right...");
+            return response;
+        }
+
+        playerObj.getCurrentRoom().leaveRoom(playerObj);
+        newRoom.enterRoom(playerObj);
+        playerObj.setCurrentRoom(newRoom);
+
+        response.setClearScreen(true);
+        response.setResponseText(this._useDoorDescription + " " + playerObj.getCurrentRoom().shortDescription);
+        return response;
     }
 }

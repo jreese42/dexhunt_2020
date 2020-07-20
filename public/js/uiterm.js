@@ -19,7 +19,7 @@ $(function() {
                     "playerInput": "",
                     "resultOutput": "Enter some text.  Type 'help' for command list."
                 }
-                $('#vorple > .previousTurn').before(render_gameTurn(turnData));
+                $('#vorple > .previousTurn').before(puglatizer.ui_gameTurn(turnData));
                 $(document).scrollTop($(document).height());
             }
             $(this).val('')
@@ -64,8 +64,12 @@ function wss_send(object) {
 
 function processServerMessage(serverMessageJson) {
     var dataObj = JSON.parse(serverMessageJson);
-    if (dataObj.console) {
+    console.log(dataObj);
+    if (dataObj.console && dataObj.console.resultOutput) {
         insertTurn(dataObj.console);
+    }
+    if (dataObj.outOfTurnOutput) {
+        insertOutOfTurnOutput(dataObj.outOfTurnOutput);
     }
 
 }
@@ -74,6 +78,16 @@ function insertTurn(turnData) {
     console.log(turnData)
     if (!turnData.playerInput)
         turnData.hideUserInput = true;
-    $('#vorple > .previousTurn').before(render_gameTurn(turnData));
+    $('#vorple > .previousTurn').before(puglatizer.ui_gameTurn(turnData));
+    $(document).scrollTop($(document).height());
+}
+
+
+function insertOutOfTurnOutput(outOfTurnOutputStr) {
+    console.log(outOfTurnOutputStr)
+    var jq = $('#vorple > .previousTurn').before(puglatizer.ui_outOfTurnOutput({"outOfTurnOutput": outOfTurnOutputStr}));
+    jq.slideDown( "slow", function() {
+        // Animation complete.
+      });
     $(document).scrollTop($(document).height());
 }

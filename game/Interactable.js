@@ -8,8 +8,8 @@ const Globals = require('./Globals.js');
 class Interactable {
     constructor(adjectivesList, nounsList) {
         this._objectId = Globals.getNextObjectId();
-        this._shortDescription = "Object Description";
-        this._longDescription = "Long Object Description";
+        this._shortDescription = "";
+        this._longDescription = "";
         this._nouns = nounsList;
         this._adjectives = adjectivesList;
         this._verbs = {}; //Map of verb => func(Player). Should return a command output string.
@@ -98,8 +98,10 @@ class Interactable {
 
         for (var i = 0; i < this._interactables.length; i++) {
             var interactable = this._interactables[i];
-            descriptions += "<br><br>"
-            descriptions += interactable.shortDescription;
+            if (interactable.shortDescription) {
+                descriptions += "<br><br>"
+                descriptions += interactable.shortDescription;
+            }
         }
         return descriptions;
     }

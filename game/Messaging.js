@@ -13,7 +13,8 @@ module.exports.ServerMessage = class ServerMessage {
                 "playerInput": "",
                 "resultOutput": "",
                 "clearScreen": false,
-            }
+            },
+            "outOfTurnOutput": ""
         }
     }
 
@@ -27,17 +28,27 @@ module.exports.ServerMessage = class ServerMessage {
 
         if (consoleOutput.resultOutput) {
             if (this.obj.console.resultOutput)
-                this.obj.console.resultOutput += "<br>"
+                this.obj.console.resultOutput += "<br>";
             this.obj.console.resultOutput += consoleOutput.resultOutput;
         }
     }
 
     hasConsoleOutput() {
-        return (this.obj.console.resultOutput != "")
+        return (this.obj.console.resultOutput != "");
+    }
+
+    appendOutOfTurnOutput(outputString) {
+
+        if (this.obj.outOfTurnOutput)
+            this.obj.outOfTurnOutput += "<br>";
+        this.obj.outOfTurnOutput += outputString;
+    }
+
+    hasOutOfTurnOutput() {
+        return (this.obj.outOfTurnOutput != "");
     }
 
     toObject() {
-        console.log(this.obj)
         return this.obj;
     }
 }

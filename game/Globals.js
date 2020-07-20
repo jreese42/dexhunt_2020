@@ -17,8 +17,16 @@ const getWorld = () => {
     return g_world;
 }
 
+//Utility names for the rooms as they're ordered in World.worldMap[].
+const roomNumbers = {
+    "entry": 0,
+    "simonSays": 1,
+    "treasure": 2
+};
+
 module.exports = {
     getNextObjectId,
     setWorld,
     getWorld,
+    roomNumbers,
 }

@@ -14,6 +14,7 @@ const tempInventoryPlaceholderText = "Inventory: Pocket Lint";
 
 class Player {
     constructor() {
+        this._ws = null;
         /* The player context is a "scratchpad" for any data storage.  Any Interactable or Room can access, modify, or delete this data.
          * This data is not stored in the database.  Objects may use this structure to share game state but must not rely on the data being avaiable. */
         this.playerContext = {};
@@ -48,6 +49,10 @@ class Player {
         return response;
     }
 
+    set ws(ws) {
+        this._ws = ws
+    }
+
     setCurrentRoom(roomObj) {
         this.currentRoom = roomObj;
     }
@@ -64,6 +69,14 @@ class Player {
         if (key in this.playerContext)
             return this.playerContext[key];
         return null;
+    }
+
+    sendConsoleLine(consoleLine) {
+        if (this._ws) {
+            var message = new Messaging.ServerMessage();
+            message.appendOutOfTurnOutput(consoleLine);
+            this._ws.send(JSON.stringify(message.toObject()))
+        }
     }
 
 }

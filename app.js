@@ -21,11 +21,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Pug for Client side
-// Compile the client templates function strings, output functions into a client-side js script
-var jsFunctionString = pug.compileFileClient('views/client/ui_gameTurn.pug', {name: "render_gameTurn"});
-fs.writeFileSync("public/javascripts/templates.js", jsFunctionString);
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/js', express.static(path.join(__dirname, 'node_modules/jquery/dist'))); // redirect JS jQuery
 // app.use(express.static(path.join(__dirname, 'node_modules/vorple/dist'))); //Vorple

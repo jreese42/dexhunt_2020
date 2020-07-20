@@ -59,6 +59,7 @@ class WebSocketServer {
       if (data.playerId) {
         //Debugging: Reset player to first room every time they refresh
         this.playerObj.currentRoom = Globals.getWorld().getRoomByRoomNumber(0); //room1
+        this.playerObj.ws = ws;  //WS is initialized, save it to the Player object
         //Initial command - send room context to player
         var msg = new Messaging.ConsoleOutput();
         msg.setResponseText(player.getCurrentRoom().shortDescription);
