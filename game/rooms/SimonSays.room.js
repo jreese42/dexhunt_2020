@@ -189,7 +189,7 @@ r1_simonSays.longDescription = "The gnome eyes you menacingly.  You wouldn't dar
             if (!progress) progress = 0;
             if (progress <= 0)
                 response.setResponseText("You're already against the southern wall, so you can't go back any farther.");
-            if (progress <= 1)
+            else if (progress <= 1)
                 response.setResponseText("You take a single step backward.  You're almost back where you started...");
             else
                 response.setResponseText("You take a single step backward.");
